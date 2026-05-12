@@ -2,150 +2,297 @@ const TARGET_CORRECT = 15;
 
 const taskEl = document.getElementById("task");
 const form = document.getElementById("answerForm");
-const quotientInput = document.getElementById("quotientInput");
-const remainderInput = document.getElementById("remainderInput");
+const answerInput = document.getElementById("answerInput");
+
 const feedbackEl = document.getElementById("feedback");
+
 const nextBtn = document.getElementById("nextBtn");
 const restartBtn = document.getElementById("restartBtn");
+
 const correctCountEl = document.getElementById("correctCount");
 const tryCountEl = document.getElementById("tryCount");
 
+
 let currentTask = null;
-let correctCount = Number(localStorage.getItem("rest_correct") || 0);
-let tryCount = Number(localStorage.getItem("rest_tries") || 0);
-let completed = localStorage.getItem("rest_completed") === "true";
 
-function randomInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+let correctCount = Number(
+    localStorage.getItem("rest_correct") || 0
+);
+
+let tryCount = Number(
+    localStorage.getItem("rest_tries") || 0
+);
+
+let completed =
+    localStorage.getItem("rest_completed") === "true";
+
+
+function randomInt(min,max){
+
+    return Math.floor(
+        Math.random()*(max-min+1)
+    ) + min;
 }
 
-function createTask() {
-  const divisor = randomInt(2, 10);       // Einmaleinsreihe
-  const quotient = randomInt(1, 10);      // kleines Einmaleins
-  const remainder = randomInt(0, divisor - 1);
-  const dividend = divisor * quotient + remainder;
 
-  // Dividend bleibt ungefähr im gewünschten Bereich und ist kindgerecht.
-  if (dividend > 120) return createTask();
+function createTask(){
 
-  return { dividend, divisor, quotient, remainder };
+    const divisor = randomInt(2,10);
+
+    const quotient = randomInt(1,20);
+
+    const remainder = randomInt(
+        0,
+        divisor-1
+    );
+
+    const dividend =
+        divisor*quotient + remainder;
+
+    return{
+
+        divisor,
+        quotient,
+        remainder,
+        dividend
+    };
 }
 
-function renderStats() {
-  correctCountEl.textContent = correctCount;
-  tryCountEl.textContent = tryCount;
+
+function saveState(){
+
+    localStorage.setItem(
+        "rest_correct",
+        correctCount
+    );
+
+    localStorage.setItem(
+        "rest_tries",
+        tryCount
+    );
+
+    localStorage.setItem(
+        "rest_completed",
+        completed
+    );
 }
 
-function saveStats() {
-  localStorage.setItem("rest_correct", String(correctCount));
-  localStorage.setItem("rest_tries", String(tryCount));
-  localStorage.setItem("rest_completed", String(completed));
+
+function renderStats(){
+
+    correctCountEl.textContent =
+        correctCount;
+
+    tryCountEl.textContent =
+        tryCount;
 }
 
-function newTask() {
-  currentTask = createTask();
-  taskEl.textContent = `${currentTask.dividend} : ${currentTask.divisor} = ? Rest ?`;
 
-  quotientInput.value = "";
-  remainderInput.value = "";
-  quotientInput.disabled = false;
-  remainderInput.disabled = false;
-  form.querySelector("button").disabled = false;
+function newTask(){
 
-  feedbackEl.textContent = "";
-  feedbackEl.className = "feedback";
-  nextBtn.hidden = true;
-  quotientInput.focus();
+    currentTask = createTask();
+
+    taskEl.textContent =
+        `${currentTask.dividend} : ${currentTask.divisor} = ?`;
+
+    answerInput.value = "";
+
+    answerInput.disabled = false;
+
+    form.querySelector("button")
+        .disabled = false;
+
+    feedbackEl.textContent = "";
+    feedbackEl.className = "feedback";
+
+    nextBtn.hidden = true;
+
+    answerInput.focus();
 }
 
-function sendLearningViewDone() {
-  completed = true;
-  saveStats();
 
-  // Robuste Abschlussmeldung für Einbettungen.
-  window.parent.postMessage({
-    type: "learningview",
-    status: "completed",
-    score: correctCount,
-    maxScore: TARGET_CORRECT,
-    success: true
-  }, "*");
+function sendLearningViewDone(){
 
-  window.parent.postMessage({
-    type: "completed",
-    completed: true,
-    success: true
-  }, "*");
+    window.parent.postMessage({
+
+        type:"completed",
+        success:true
+
+    },"*");
 }
 
-function finishApp() {
-  taskEl.textContent = "Geschafft!";
-  form.hidden = true;
-  nextBtn.hidden = true;
-  restartBtn.hidden = false;
 
-  feedbackEl.textContent = "Du hast 15 Aufgaben richtig gelöst. Die Aufgabe ist abgeschlossen.";
-  feedbackEl.className = "feedback done";
+function finishApp(){
 
-  sendLearningViewDone();
-}
+    completed = true;
 
-form.addEventListener("submit", (event) => {
-  event.preventDefault();
+    saveState();
 
-  if (completed) return;
+    taskEl.textContent =
+        "Geschafft!";
 
-  const userQuotient = Number(quotientInput.value);
-  const userRemainder = Number(remainderInput.value);
+    form.hidden = true;
 
-  tryCount++;
+    nextBtn.hidden = true;
 
-  const isCorrect =
-    userQuotient === currentTask.quotient &&
-    userRemainder === currentTask.remainder;
+    restartBtn.hidden = false;
 
-  if (isCorrect) {
-    correctCount++;
-    feedbackEl.textContent = "Richtig!";
-    feedbackEl.className = "feedback good";
-  } else {
     feedbackEl.textContent =
-      `Noch nicht. Richtig wäre: ${currentTask.quotient} Rest ${currentTask.remainder}.`;
-    feedbackEl.className = "feedback bad";
-  }
+        "15 Aufgaben richtig gelöst.";
 
-  quotientInput.disabled = true;
-  remainderInput.disabled = true;
-  form.querySelector("button").disabled = true;
+    feedbackEl.className =
+        "feedback done";
 
-  renderStats();
-  saveStats();
+    sendLearningViewDone();
+}
 
-  if (correctCount >= TARGET_CORRECT) {
-    finishApp();
-  } else {
-    nextBtn.hidden = false;
-  }
-});
 
-nextBtn.addEventListener("click", newTask);
+form.addEventListener(
+    "submit",
+    function(event){
 
-restartBtn.addEventListener("click", () => {
-  correctCount = 0;
-  tryCount = 0;
-  completed = false;
-  saveStats();
+        event.preventDefault();
 
-  form.hidden = false;
-  restartBtn.hidden = true;
-  renderStats();
-  newTask();
-});
+        if(completed){
+            return;
+        }
+
+        const raw =
+            answerInput.value.trim();
+
+        // erlaubt:
+        // 9R8
+        // 9 R8
+        // 9r8
+        // 9 r8
+
+        const match =
+            raw.match(
+                /^(\d+)\s*[rR]\s*(\d+)$/
+            );
+
+        let isCorrect = false;
+
+        if(match){
+
+            const userQuotient =
+                Number(match[1]);
+
+            const userRemainder =
+                Number(match[2]);
+
+
+            // immer sauber darstellen
+            answerInput.value =
+                `${userQuotient} R${userRemainder}`;
+
+
+            isCorrect =
+
+                userQuotient ===
+                currentTask.quotient
+
+                &&
+
+                userRemainder ===
+                currentTask.remainder;
+        }
+
+
+        tryCount++;
+
+        if(isCorrect){
+
+            correctCount++;
+
+            feedbackEl.textContent =
+                "Richtig!";
+
+            feedbackEl.className =
+                "feedback good";
+
+        }else{
+
+            feedbackEl.textContent =
+
+                `Falsch. Richtig wäre: ` +
+
+                `${currentTask.quotient}` +
+
+                ` R${currentTask.remainder}`;
+
+            feedbackEl.className =
+                "feedback bad";
+        }
+
+
+        answerInput.disabled = true;
+
+        form.querySelector("button")
+            .disabled = true;
+
+
+        renderStats();
+
+        saveState();
+
+
+        if(
+            correctCount >=
+            TARGET_CORRECT
+        ){
+
+            finishApp();
+
+        }else{
+
+            nextBtn.hidden = false;
+        }
+    }
+);
+
+
+nextBtn.addEventListener(
+    "click",
+    newTask
+);
+
+
+restartBtn.addEventListener(
+    "click",
+    function(){
+
+        correctCount = 0;
+
+        tryCount = 0;
+
+        completed = false;
+
+        form.hidden = false;
+
+        restartBtn.hidden = true;
+
+        saveState();
+
+        renderStats();
+
+        newTask();
+    }
+);
+
 
 renderStats();
 
-if (completed || correctCount >= TARGET_CORRECT) {
-  finishApp();
-} else {
-  newTask();
+
+if(
+    completed
+    ||
+    correctCount >= TARGET_CORRECT
+){
+
+    finishApp();
+
+}else{
+
+    newTask();
 }
