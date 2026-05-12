@@ -1,45 +1,61 @@
 <!doctype html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Teilen mit Rest</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teilen mit Rest</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main class="app">
+
+<main class="app">
+
     <section class="card">
-      <h1>Teilen mit Rest</h1>
-      <p class="subtitle">Löse 15 Aufgaben richtig.</p>
 
-      <div class="progress">
-        <div>Richtig: <strong id="correctCount">0</strong> / 15</div>
-        <div>Versuche: <strong id="tryCount">0</strong></div>
-      </div>
+        <h1>Teilen mit Rest</h1>
+        <p class="subtitle">Löse 15 Aufgaben richtig.</p>
 
-      <div id="task" class="task">...</div>
+        <div class="stats">
+            <div>Richtig: <span id="correctCount">0</span> / 15</div>
+            <div>Versuche: <span id="tryCount">0</span></div>
+        </div>
 
-      <form id="answerForm">
-        <label>
-          Ergebnis:
-          <input id="quotientInput" type="number" min="0" inputmode="numeric" required />
-        </label>
+        <div id="task" class="task"></div>
 
-        <label>
-          Rest:
-          <input id="remainderInput" type="number" min="0" inputmode="numeric" required />
-        </label>
+        <form id="answerForm">
 
-        <button type="submit">Prüfen</button>
-      </form>
+            <label>
+                Antwort:
+                <input
+                    id="answerInput"
+                    type="text"
+                    autocomplete="off"
+                    spellcheck="false"
+                    required
+                >
+            </label>
 
-      <div id="feedback" class="feedback"></div>
+            <button type="submit">
+                Prüfen
+            </button>
 
-      <button id="nextBtn" class="secondary" hidden>Nächste Aufgabe</button>
-      <button id="restartBtn" class="secondary" hidden>Neu starten</button>
+        </form>
+
+        <div id="feedback" class="feedback"></div>
+
+        <button id="nextBtn" hidden>
+            Nächste Aufgabe
+        </button>
+
+        <button id="restartBtn" hidden>
+            Neu starten
+        </button>
+
     </section>
-  </main>
 
-  <script src="app.js"></script>
+</main>
+
+<script src="app.js"></script>
+
 </body>
 </html>
