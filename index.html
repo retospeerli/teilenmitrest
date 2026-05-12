@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Teilen mit Rest</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="app">
+    <section class="card">
+      <h1>Teilen mit Rest</h1>
+      <p class="subtitle">Löse 15 Aufgaben richtig.</p>
+
+      <div class="progress">
+        <div>Richtig: <strong id="correctCount">0</strong> / 15</div>
+        <div>Versuche: <strong id="tryCount">0</strong></div>
+      </div>
+
+      <div id="task" class="task">...</div>
+
+      <form id="answerForm">
+        <label>
+          Ergebnis:
+          <input id="quotientInput" type="number" min="0" inputmode="numeric" required />
+        </label>
+
+        <label>
+          Rest:
+          <input id="remainderInput" type="number" min="0" inputmode="numeric" required />
+        </label>
+
+        <button type="submit">Prüfen</button>
+      </form>
+
+      <div id="feedback" class="feedback"></div>
+
+      <button id="nextBtn" class="secondary" hidden>Nächste Aufgabe</button>
+      <button id="restartBtn" class="secondary" hidden>Neu starten</button>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
