@@ -17,7 +17,7 @@ body{
 
 .card{
     background:white;
-    width:min(520px,100%);
+    width:min(540px,100%);
     padding:30px;
     border-radius:20px;
     box-shadow:0 10px 30px rgba(0,0,0,.15);
@@ -67,11 +67,27 @@ input{
 }
 
 button{
+    width:100%;
     font-size:1.2rem;
+    font-weight:bold;
     padding:14px;
+    margin-top:12px;
     border:none;
     border-radius:12px;
     cursor:pointer;
+    background:#2563eb;
+    color:white;
+}
+
+button span{
+    font-size:.9rem;
+    font-weight:normal;
+}
+
+#menuBtn,
+#restartBtn,
+#nextBtn{
+    background:#334155;
 }
 
 .feedback{
