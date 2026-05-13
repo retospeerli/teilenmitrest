@@ -29,30 +29,29 @@ let completed = false;
 
 const LEVELS = {
     grade3: {
-        label: "3. Klasse · kleines Einmaleins 2–10 · Faktor bis 12",
+        label: "3. Klasse · Faktor bis 12",
         maxFactor: 12
     },
     grade4: {
-        label: "4. Klasse · kleines Einmaleins 2–10 · Faktor bis 20",
+        label: "4. Klasse · Faktor bis 20",
         maxFactor: 20
     }
 };
 
 function randomInt(min,max){
-    return Math.floor(Math.random()*(max-min+1)) + min;
+    return Math.floor(Math.random()*(max-min+1))+min;
 }
 
 function createTask(){
     const divisor = randomInt(2,10);
     const quotient = randomInt(1,currentLevel.maxFactor);
     const remainder = randomInt(0,divisor-1);
-    const dividend = divisor*quotient + remainder;
 
     return {
         divisor,
         quotient,
         remainder,
-        dividend
+        dividend: divisor*quotient + remainder
     };
 }
 
@@ -79,58 +78,57 @@ function newTask(){
 }
 
 function parseAnswer(raw){
+
     raw = raw.trim();
 
+    // Mit Rest
     const withRest = raw.match(/^(\d+)\s*[rR]\s*(\d+)$/);
     if(withRest){
         return {
-            validPattern: true,
-            quotient: Number(withRest[1]),
-            remainder: Number(withRest[2]),
-            formatted: `${Number(withRest[1])} R${Number(withRest[2])}`
+            valid:true,
+            q:Number(withRest[1]),
+            r:Number(withRest[2]),
+            formatted:`${Number(withRest[1])} R${Number(withRest[2])}`
         };
     }
 
+    // Ohne Rest
     const withoutRest = raw.match(/^(\d+)$/);
     if(withoutRest){
         return {
-            validPattern: true,
-            quotient: Number(withoutRest[1]),
-            remainder: null,
-            formatted: `${Number(withoutRest[1])}`
+            valid:true,
+            q:Number(withoutRest[1]),
+            r:null,
+            formatted:`${Number(withoutRest[1])}`
         };
     }
 
-    return {
-        validPattern: false,
-        quotient: null,
-        remainder: null,
-        formatted: raw
-    };
+    return { valid:false };
 }
 
-function isAnswerCorrect(answer){
-    if(!answer.validPattern){
-        return false;
-    }
+function isCorrect(ans){
+
+    if(!ans.valid) return false;
 
     if(currentTask.remainder === 0){
         return (
-            answer.quotient === currentTask.quotient &&
-            (
-                answer.remainder === 0 ||
-                answer.remainder === null
-            )
+            ans.q === currentTask.quotient &&
+            (ans.r === 0 || ans.r === null)
         );
     }
 
     return (
-        answer.quotient === currentTask.quotient &&
-        answer.remainder === currentTask.remainder
+        ans.q === currentTask.quotient &&
+        ans.r === currentTask.remainder
     );
 }
 
 function sendLearningViewDone(){
+
+    // WICHTIG: LearningView erkennt DAS
+    window.parent.postMessage("AppSolved","*");
+
+    // Backup (optional)
     window.parent.postMessage({
         type:"completed",
         success:true
@@ -138,6 +136,7 @@ function sendLearningViewDone(){
 }
 
 function finishApp(){
+
     completed = true;
 
     taskEl.textContent = "Geschafft!";
@@ -152,6 +151,7 @@ function finishApp(){
 }
 
 function startLevel(levelKey){
+
     currentLevel = LEVELS[levelKey];
 
     correctCount = 0;
@@ -162,27 +162,23 @@ function startLevel(levelKey){
 
     menuCard.hidden = true;
     gameCard.hidden = false;
-    form.hidden = false;
-    restartBtn.hidden = true;
 
     renderStats();
     newTask();
 }
 
-form.addEventListener("submit", function(event){
-    event.preventDefault();
+form.addEventListener("submit", function(e){
 
-    if(completed){
-        return;
-    }
+    e.preventDefault();
+    if(completed) return;
 
-    const answer = parseAnswer(answerInput.value);
-    const correct = isAnswerCorrect(answer);
+    const ans = parseAnswer(answerInput.value);
+    const correct = isCorrect(ans);
 
     tryCount++;
 
-    if(answer.validPattern){
-        answerInput.value = answer.formatted;
+    if(ans.valid){
+        answerInput.value = ans.formatted;
     }
 
     if(correct){
@@ -190,6 +186,7 @@ form.addEventListener("submit", function(event){
         feedbackEl.textContent = "Richtig!";
         feedbackEl.className = "feedback good";
     }else{
+
         let correctText = `${currentTask.quotient}`;
 
         if(currentTask.remainder !== 0){
@@ -216,22 +213,17 @@ form.addEventListener("submit", function(event){
     }
 });
 
-grade3Btn.addEventListener("click", function(){
-    startLevel("grade3");
-});
+grade3Btn.onclick = () => startLevel("grade3");
+grade4Btn.onclick = () => startLevel("grade4");
 
-grade4Btn.addEventListener("click", function(){
-    startLevel("grade4");
-});
+nextBtn.onclick = newTask;
 
-nextBtn.addEventListener("click", newTask);
-
-menuBtn.addEventListener("click", function(){
+menuBtn.onclick = () => {
     gameCard.hidden = true;
     menuCard.hidden = false;
-});
+};
 
-restartBtn.addEventListener("click", function(){
+restartBtn.onclick = () => {
     correctCount = 0;
     tryCount = 0;
     completed = false;
@@ -241,4 +233,4 @@ restartBtn.addEventListener("click", function(){
 
     renderStats();
     newTask();
-});
+};
