@@ -10,10 +10,18 @@
 
 <main class="app">
 
-    <section class="card">
+    <section id="menuCard" class="card">
+        <h1>Teilen mit Rest</h1>
+        <p class="subtitle">Wähle deine Schwierigkeitsstufe.</p>
+
+        <button id="grade3Btn">3. Klasse<br><span>Einmaleins 2–10 · Faktor bis 12</span></button>
+        <button id="grade4Btn">4. Klasse<br><span>Einmaleins 2–10 · Faktor bis 20</span></button>
+    </section>
+
+    <section id="gameCard" class="card" hidden>
 
         <h1>Teilen mit Rest</h1>
-        <p class="subtitle">Löse 15 Aufgaben richtig.</p>
+        <p id="levelText" class="subtitle"></p>
 
         <div class="stats">
             <div>Richtig: <span id="correctCount">0</span> / 15</div>
@@ -23,7 +31,6 @@
         <div id="task" class="task"></div>
 
         <form id="answerForm">
-
             <label>
                 Antwort:
                 <input
@@ -35,21 +42,14 @@
                 >
             </label>
 
-            <button type="submit">
-                Prüfen
-            </button>
-
+            <button type="submit">Prüfen</button>
         </form>
 
         <div id="feedback" class="feedback"></div>
 
-        <button id="nextBtn" hidden>
-            Nächste Aufgabe
-        </button>
-
-        <button id="restartBtn" hidden>
-            Neu starten
-        </button>
+        <button id="nextBtn" hidden>Nächste Aufgabe</button>
+        <button id="menuBtn">Zurück zum Menü</button>
+        <button id="restartBtn" hidden>Neu starten</button>
 
     </section>
 
